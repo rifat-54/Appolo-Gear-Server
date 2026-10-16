@@ -19,6 +19,26 @@ export * as $Enums from './enums'
 export * from './enums';
 /**
  * Model User
- * 
+ * User model - represents users in the system (admin, user, driver)
  */
 export type User = Prisma.UserModel
+/**
+ * Model Car
+ * Car model - represents vehicles available for rent
+ */
+export type Car = Prisma.CarModel
+/**
+ * Model Rent
+ * Rent model - represents a rental transaction
+ */
+export type Rent = Prisma.RentModel
+/**
+ * Model Bid
+ * Bid model - represents a bid made by a driver for a rent
+ */
+export type Bid = Prisma.BidModel
+/**
+ * Model Payment
+ * Payment model - represents a payment transaction
+ */
+export type Payment = Prisma.PaymentModel

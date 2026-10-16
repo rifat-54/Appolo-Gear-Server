@@ -8,10 +8,137 @@ datasource db {
    url      = env("DATABASE_URL")
 }
 
+enum BidStatus {
+  accepted
+  pending
+  rejected
+}
+
+enum FuelType {
+  Octane
+  Hybrid
+  Electric
+  Diesel
+  Petrol
+}
+
+enum CarCondition {
+  New
+  Used
+}
+
+enum RentStatus {
+  pending
+  ongoing
+  completed
+}
+
+enum UserRole {
+  admin
+  user
+  driver
+}
+
+// ==================== MODELS ====================
+
+/// User model - represents users in the system (admin, user, driver)
 model User {
-    id        String   @id @default(uuid())
-    email     String   @unique
-    name      String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  password String?
+  role     UserRole @default(user)
+  img      String?
+  rating   Float    @default(0)
+
+  // Relations
+  rents Rent[]
+  bids  Bid[]  @relation("DriverBids")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+/// Car model - represents vehicles available for rent
+model Car {
+  id                String       @id @default(uuid())
+  name              String
+  brand             String
+  model             String
+  image             String
+  rating            Float        @default(0)
+  fuelType          FuelType
+  passengerCapacity Int
+  color             String
+  condition         CarCondition
+
+  // Relations
+  rents Rent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cars")
+}
+
+/// Rent model - represents a rental transaction
+model Rent {
+  id            String     @id @default(uuid())
+  rentStatus    RentStatus @default(pending)
+  startingPoint String
+  destination   String
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  carId String
+  car   Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  bids Bid[]
+  payment Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("rents")
+}
+
+/// Bid model - represents a bid made by a driver for a rent
+model Bid {
+  id             String    @id @default(uuid())
+  bidAmount      Float
+  bidStatus      BidStatus @default(pending)
+  driverLocation String
+
+  // Relations
+  rentId String
+  rent   Rent   @relation(fields: [rentId], references: [id], onDelete: Cascade)
+
+  driverId String
+  driver   User   @relation("DriverBids", fields: [driverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bids")
+}
+
+/// Payment model - represents a payment transaction
+model Payment {
+  id                String   @id @default(uuid())
+  transactionId     String   @unique
+  amount            Float
+  status            String   @default("Pending")
+  paymentGatewayData Json?
+
+  rentId String @unique
+  rent   Rent   @relation(fields: [rentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
 }
