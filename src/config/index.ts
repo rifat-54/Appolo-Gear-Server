@@ -14,4 +14,8 @@ export default {
     jwt_refresh_secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
     jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
+  admin: {
+    email: process.env.ADMIN_EMAIL || 'admin@gmail.com',
+    password: process.env.ADMIN_PASSWORD || 'admin123456',
+  },
 };
