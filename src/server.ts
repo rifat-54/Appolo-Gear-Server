@@ -1,17 +1,21 @@
 import { Server } from 'http';
 import app from './app';
 import config from './config';
+import { prisma } from './lib/prisma';
 
 let server: Server;
 
 // Handle uncaught exceptions (synchronous errors)
 process.on('uncaughtException', (err) => {
   console.log('😈 uncaughtException is detected, shutting down...', err);
+  prisma.$disconnect();
   process.exit(1);
 });
 
 async function main() {
   try {
+    await prisma.$connect();
+    console.log('database connected');
     server = app.listen(config.port, () => {
       console.log(`Server is running on port ${config.port}`);
     });
@@ -27,6 +31,7 @@ process.on('unhandledRejection', (err) => {
   console.log('😈 unhandledRejection is detected, shutting down...', err);
   if (server) {
     server.close(() => {
+      prisma.$disconnect();
       process.exit(1);
     });
   } else {
@@ -39,6 +44,7 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM is received, shutting down gracefully...');
   if (server) {
     server.close(() => {
+      prisma.$disconnect();
       console.log('Process terminated!');
     });
   }
@@ -49,6 +55,7 @@ process.on('SIGINT', () => {
   console.log('SIGINT is received, shutting down gracefully...');
   if (server) {
     server.close(() => {
+      prisma.$disconnect();
       console.log('Process terminated!');
       process.exit(0);
     });
