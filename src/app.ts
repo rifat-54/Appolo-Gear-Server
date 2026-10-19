@@ -3,10 +3,17 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import globalErrorHandler from './middlewares/globalErrorHandler';
 import notFound from './middlewares/notFound';
-
 import router from './routes';
+import { PaymentController } from './modules/Payment/payment.controller';
 
 const app: Application = express();
+
+// Stripe webhook MUST receive the raw body — register before express.json()
+app.post(
+  '/api/v1/payments/webhook',
+  express.raw({ type: 'application/json' }),
+  PaymentController.handleWebhook
+);
 
 // parsers
 app.use(express.json());

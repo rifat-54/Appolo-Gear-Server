@@ -18,4 +18,10 @@ export default {
     email: process.env.ADMIN_EMAIL || 'admin@gmail.com',
     password: process.env.ADMIN_PASSWORD || 'admin123456',
   },
+  stripe: {
+    secret_key: process.env.STRIPE_SECRET_KEY || '',
+    webhook_secret: process.env.STRIPE_WEBHOOK_SECRET || '',
+    success_url: process.env.STRIPE_SUCCESS_URL || 'http://localhost:3000/payment/success',
+    cancel_url: process.env.STRIPE_CANCEL_URL || 'http://localhost:3000/payment/cancel',
+  },
 };
